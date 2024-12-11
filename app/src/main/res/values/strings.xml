@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">BestWorkout</string>
+    <string name="enter_your_name">Enter your name</string>
+    <string name="enter_username">Enter Username</string>
+    <string name="enter_password">Enter Password</string>
+    <string name="register">Register</string>
+    <string name="welcome">Welcome to BestWorkout</string>
+    <string name="log_out">Log out</string>
+    <string name="welcome_main">Welcome to the future!</string>
+    <string name="enter_button">Log in</string>
+    <string name="registration_button">Register</string>
+    <string name="repeat_your_password">Repeat your password</string>
+    <string name="registration_page">Registration Page</string>
+
+</resources>
