@@ -1,8 +1,8 @@
 package com.example.bestworkout;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -10,20 +10,14 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class RegisterActivity extends AppCompatActivity {
     private EditText username;
     private EditText password;
     private EditText repPassword;
-    private SharedPreferences sharedPreferences;
-    private Gson gson;
-    private Map<String, String> users;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +25,7 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         initializeViews();
-        initializeSharedPreferences();
+        initializeFirebaseAuth();
     }
 
     private void initializeViews() {
@@ -42,12 +36,8 @@ public class RegisterActivity extends AppCompatActivity {
         registerButton.setOnClickListener(this::registerUser);
     }
 
-    private void initializeSharedPreferences() {
-        sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
-        String usersJson = sharedPreferences.getString("users", "{}");
-        gson = new Gson();
-        Type type = new TypeToken<HashMap<String, String>>() {}.getType();
-        users = gson.fromJson(usersJson, type);
+    private void initializeFirebaseAuth() {
+        mAuth = FirebaseAuth.getInstance();
     }
 
     private void registerUser(View view) {
@@ -57,8 +47,6 @@ public class RegisterActivity extends AppCompatActivity {
 
         if (user.isEmpty()) {
             showToast("Write username");
-        } else if (users.containsKey(user)) {
-            showToast("Username already exists");
         } else if (pass.isEmpty() || repPass.isEmpty()) {
             showToast("Write password");
         } else if (!pass.equals(repPass)) {
@@ -66,8 +54,7 @@ public class RegisterActivity extends AppCompatActivity {
         } else if (!isValidPassword(pass)) {
             showToast("Password must be at least 9 characters long and include both letters and numbers");
         } else {
-            saveUser(user, pass);
-            navigateToHome();
+            createUserInFirebase(user, pass);
         }
     }
 
@@ -90,15 +77,23 @@ public class RegisterActivity extends AppCompatActivity {
         return false;
     }
 
-    private void showToast(String message) {
-        Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
+    private void createUserInFirebase(String user, String pass) {
+        mAuth.createUserWithEmailAndPassword(user + "@example.com", pass)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                        if (firebaseUser != null) {
+                            navigateToHome();
+                        }
+                    } else {
+                        showToast("Registration failed: " + task.getException().getMessage());
+                        Log.d("RegisterActivity.class", task.getException().getMessage());
+                    }
+                });
     }
 
-    private void saveUser(String user, String pass) {
-        users.put(user, pass);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("users", gson.toJson(users));
-        editor.apply();
+    private void showToast(String message) {
+        Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
     }
 
     private void navigateToHome() {

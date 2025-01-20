@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "274561054661",
+    "project_id": "bestworkout-d8d90",
+    "storage_bucket": "bestworkout-d8d90.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:274561054661:android:f6fb784213d93adce5bdac",
+        "android_client_info": {
+          "package_name": "com.example.bestworkout"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwcCAp4BAD_7H1-fhd4r1rYMXp_gNUh9o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
