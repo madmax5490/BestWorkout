@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutViewHolder> {
 
-    private ArrayList<Workout> workouts;
+    private final ArrayList<Workout> workouts;
 
     public WorkoutAdapter(ArrayList<Workout> workouts) {
         this.workouts = workouts;

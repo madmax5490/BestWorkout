@@ -11,6 +11,8 @@
     <string name="registration_button">Register</string>
     <string name="repeat_your_password">Repeat your password</string>
     <string name="registration_page">Registration Page</string>
+    <string name="profile">Profile</string>
+    <string name="open_drawer">side menu\n</string>
     <string-array name="gender_array">
         <item>Male</item>
         <item>Female</item>

@@ -2,8 +2,8 @@ package com.example.bestworkout;
 
 public class Workout {
     private String type;
-    private String time;
-    private String days;
+    private final String time;
+    private final String days;
 
     public Workout(String type, String time, String days) {
         this.type = type;

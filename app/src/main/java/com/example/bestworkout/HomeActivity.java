@@ -7,10 +7,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -25,6 +28,7 @@ public class HomeActivity extends AppCompatActivity {
     private RecyclerView workoutList;
     private WorkoutAdapter workoutAdapter;
     private ArrayList<Workout> workouts;
+    private DrawerLayout drawerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +43,34 @@ public class HomeActivity extends AppCompatActivity {
         workoutList.setLayoutManager(new LinearLayoutManager(this));
         workoutAdapter = new WorkoutAdapter(workouts);
         workoutList.setAdapter(workoutAdapter);
+
+        drawerLayout = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        ImageButton openDrawerButton = findViewById(R.id.open_drawer_button);
+
+        openDrawerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerLayout.openDrawer(navigationView);
+            }
+        });
+
+        navigationView.setNavigationItemSelectedListener(item -> {
+            final int itemId = item.getItemId();
+            if (itemId == R.id.nav_profile) {
+                Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+                startActivity(intent);
+                finish();
+            } else if (itemId == R.id.nav_settings) {
+                // Handle settings action
+            } else if (itemId == R.id.nav_logout) {
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(HomeActivity.this, WelcomeActivity.class));
+                finish();
+            }
+            drawerLayout.closeDrawer(navigationView);
+            return true;
+        });
 
         loadWorkouts();
     }
@@ -100,16 +132,16 @@ public class HomeActivity extends AppCompatActivity {
     }
 
 
-    public void navigateToProfile(View view) {
-        Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
-        startActivity(intent);
-        finish();
-    }
+//    public void navigateToProfile(View view) {
+//        Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+//        startActivity(intent);
+//        finish();
+//    }
 
-    public void logoutButton(View view) {
-        Intent intent = new Intent(HomeActivity.this, WelcomeActivity.class);
-        FirebaseUser currentUser = null;
-        startActivity(intent);
-        finish();
-    }
+//    public void logoutButton(View view) {
+//        Intent intent = new Intent(HomeActivity.this, WelcomeActivity.class);
+//        FirebaseUser currentUser = null;
+//        startActivity(intent);
+//        finish();
+//    }
 }
