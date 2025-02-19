@@ -15,5 +15,12 @@
         <item>Male</item>
         <item>Female</item>
     </string-array>
+        <string-array name="workout_types">
+            <item>Running</item>
+            <item>Swimming</item>
+            <item>Tennis</item>
+            <item>Gym</item>
+            <item>Cycling</item>
+        </string-array>
 
 </resources>

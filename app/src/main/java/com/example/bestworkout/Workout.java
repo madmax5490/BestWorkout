@@ -11,6 +11,9 @@ public class Workout {
         this.days = days;
     }
 
+    public void setType(String type) {
+        this.type = type;
+    }
     public String getType() {
         return type;
     }
