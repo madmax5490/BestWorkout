@@ -1,46 +1,68 @@
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
 
-    <EditText
-        android:id="@+id/workout_type"
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Workout Type:"
+        android:textStyle="bold" />
+
+    <Spinner
+        android:id="@+id/workout_type_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:hint="Workout Type"
-        android:minHeight="48dp"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="16dp"/>
+        android:layout_marginTop="8dp"
+        android:entries="@array/workout_types" />
 
-    <EditText
-        android:id="@+id/workout_time"
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Choose Time:"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/time_picker_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:hint="Workout Time"
-        android:minHeight="48dp"
-        app:layout_constraintTop_toBottomOf="@id/workout_type"
-        tools:layout_editor_absoluteX="16dp" />
+        android:text="Select Time" />
 
-    <EditText
-        android:id="@+id/workout_days"
+    <TextView
+        android:id="@+id/selected_time_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:hint="Workout Days (e.g., Mon, Wed, Fri)"
-        android:minHeight="48dp"
-        app:layout_constraintTop_toBottomOf="@id/workout_time"
-        tools:layout_editor_absoluteX="16dp" />
+        android:textAlignment="center"
+        android:text="Not selected" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Select Days:"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <CheckBox android:id="@+id/monday" android:text="Monday" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        <CheckBox android:id="@+id/tuesday" android:text="Tuesday" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        <CheckBox android:id="@+id/wednesday" android:text="Wednesday" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        <CheckBox android:id="@+id/thursday" android:text="Thursday" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        <CheckBox android:id="@+id/friday" android:text="Friday" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        <CheckBox android:id="@+id/saturday" android:text="Saturday" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        <CheckBox android:id="@+id/sunday" android:text="Sunday" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/save_button"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Save"
-        android:layout_margin="16dp"
-        app:layout_constraintTop_toBottomOf="@id/workout_days"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_marginTop="16dp"
+        android:text="Save" />
+</LinearLayout>
