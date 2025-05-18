@@ -1,29 +1,40 @@
 package com.example.bestworkout;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
+import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.net.Uri;
+import android.util.Log;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import android.app.TimePickerDialog;
-import android.widget.CheckBox;
 import java.util.Locale;
+import java.util.Calendar;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -33,16 +44,25 @@ public class HomeActivity extends AppCompatActivity {
     private WorkoutAdapter workoutAdapter;
     private ArrayList<Workout> workouts;
     private DrawerLayout drawerLayout;
+    private AlarmManager alarmManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 101);
+            }
+        }
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         workouts = new ArrayList<>();
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
+        //
         // Инициализация RecyclerView
         workoutList = findViewById(R.id.workout_list);
         workoutList.setLayoutManager(new LinearLayoutManager(this));
@@ -100,6 +120,8 @@ public class HomeActivity extends AppCompatActivity {
         String type = workout.getType();
         String time = workout.getTime();
         String days = workout.getDays();
+
+        cancelWorkoutAlarm(type, time, days);
 
         // Запрос на удаление тренировки
         db.collection("users").document(userId).collection("workouts")
@@ -214,10 +236,13 @@ public class HomeActivity extends AppCompatActivity {
                 .addOnSuccessListener(documentReference -> {
                     workouts.add(new Workout(type, time, days));
                     workoutAdapter.notifyDataSetChanged();
-                    Toast.makeText(HomeActivity.this, "Тренировка запланирована", Toast.LENGTH_SHORT).show();
+
+                    scheduleWorkoutAlarm(type, time, days);
+
+                    Toast.makeText(HomeActivity.this, "Workout is scheduled", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> Toast.makeText(HomeActivity.this,
-                        "Не удалось запланировать тренировку", Toast.LENGTH_SHORT).show());
+                        "Failed to schedule workout", Toast.LENGTH_SHORT).show());
     }
 
     private void loadWorkouts() {
@@ -234,6 +259,130 @@ public class HomeActivity extends AppCompatActivity {
                     workoutAdapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e -> Toast.makeText(HomeActivity.this,
-                        "Не удалось загрузить тренировки", Toast.LENGTH_SHORT).show());
+                        "Failed to load workouts", Toast.LENGTH_SHORT).show());
     }
+
+    // Метод для установки будильника для уведомлений о тренировке
+    private void scheduleWorkoutAlarm(String type, String time, String days) {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (!alarmManager.canScheduleExactAlarms()) {
+                    Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+                    startActivity(intent);
+                    Toast.makeText(this, "Please, allow precise alarms", Toast.LENGTH_LONG).show();
+                    return;
+                }
+            }
+
+            // Парсим время тренировки
+            String[] timeParts = time.split(":");
+            int hour = Integer.parseInt(timeParts[0]);
+            int minute = Integer.parseInt(timeParts[1]);
+
+            // Для каждого выбранного дня устанавливаем отдельный будильник
+            String[] daysArray = days.split(",");
+            for (String day : daysArray) {
+                int dayOfWeek = getDayOfWeek(day);
+
+                if (dayOfWeek != -1) {
+                    // Создаем уникальный requestCode для каждого будильника
+                    int requestCode = (hour * 100 + minute) * 10 + dayOfWeek;
+
+                    // Создаем Intent для BroadcastReceiver
+                    Intent intent = new Intent(this, WorkoutAlarmReceiver.class);
+                    intent.putExtra("workoutType", type);
+                    intent.putExtra("workoutTime", time);
+
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                            this, requestCode, intent, PendingIntent.FLAG_IMMUTABLE);
+
+                    // Настраиваем календарь на нужный день недели и время
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(Calendar.DAY_OF_WEEK, dayOfWeek);
+                    calendar.set(Calendar.HOUR_OF_DAY, hour);
+                    calendar.set(Calendar.MINUTE, minute);
+                    calendar.set(Calendar.SECOND, 0);
+
+                    // Если время уже прошло на текущей неделе, переносим на следующую
+                    if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
+                        calendar.add(Calendar.WEEK_OF_YEAR, 1);
+                    }
+
+                    // Устанавливаем еженедельный повторяющийся будильник
+                    alarmManager.setRepeating(
+                            AlarmManager.RTC_WAKEUP,
+                            calendar.getTimeInMillis(),
+                            AlarmManager.INTERVAL_DAY * 7, // Повторение каждую неделю
+                            pendingIntent
+                    );
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        alarmManager.setExactAndAllowWhileIdle(
+                                AlarmManager.RTC_WAKEUP,
+                                calendar.getTimeInMillis(),
+                                pendingIntent
+                        );
+                    } else {
+                        alarmManager.setExact(
+                                AlarmManager.RTC_WAKEUP,
+                                calendar.getTimeInMillis(),
+                                pendingIntent
+                        );
+                    }
+
+                    Log.d("WorkoutAlarm", "Alarm scheduled at " + calendar.getTime() +
+                            " for workout " + type);
+
+                }
+            }
+        } catch (Exception e) {
+            Log.e("WorkoutAlarm", "Error with alarm scheduling", e);
+            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void cancelWorkoutAlarm(String type, String time, String days) {
+        try {
+            // Парсим время тренировки
+            String[] timeParts = time.split(":");
+            int hour = Integer.parseInt(timeParts[0]);
+            int minute = Integer.parseInt(timeParts[1]);
+
+            // Отменяем будильники для всех дней тренировки
+            String[] daysArray = days.split(",");
+            for (String day : daysArray) {
+                int dayOfWeek = getDayOfWeek(day);
+
+                if (dayOfWeek != -1) {
+                    // Создаем такой же requestCode, как при создании
+                    int requestCode = (hour * 100 + minute) * 10 + dayOfWeek;
+
+                    Intent intent = new Intent(this, WorkoutAlarmReceiver.class);
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                            this, requestCode, intent, PendingIntent.FLAG_IMMUTABLE);
+
+                    // Отменяем будильник
+                    alarmManager.cancel(pendingIntent);
+                    pendingIntent.cancel();
+                }
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Ошибка при отмене уведомлений: " + e.getMessage(),
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private int getDayOfWeek(String day) {
+        switch (day) {
+            case "Mon": return Calendar.MONDAY;
+            case "Tue": return Calendar.TUESDAY;
+            case "Wed": return Calendar.WEDNESDAY;
+            case "Thu": return Calendar.THURSDAY;
+            case "Fri": return Calendar.FRIDAY;
+            case "Sat": return Calendar.SATURDAY;
+            case "Sun": return Calendar.SUNDAY;
+            default: return -1;
+        }
+    }
+
 }
