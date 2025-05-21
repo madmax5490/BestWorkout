@@ -22,6 +22,7 @@
     <string name="height">Height</string>
     <string name="save_changes">Save changes</string>
     <string name="add_workout">Add Workout</string>
+    <string name="ReturnButton">Return BaCK</string>
     <string-array name="gender_array">
         <item>Male</item>
         <item>Female</item>

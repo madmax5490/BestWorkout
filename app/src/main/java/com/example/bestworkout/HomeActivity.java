@@ -91,7 +91,7 @@ public class HomeActivity extends AppCompatActivity {
                 // Обработка настроек
             } else if (itemId == R.id.nav_logout) {
                 FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(HomeActivity.this, WelcomeActivity.class));
+                startActivity(new Intent(HomeActivity.this, AuthActivity.class));
                 finish();
             }
             drawerLayout.closeDrawer(navigationView);

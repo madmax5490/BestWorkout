@@ -1,43 +1,56 @@
+// RegisterFragment.java
 package com.example.bestworkout;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import androidx.appcompat.widget.AppCompatImageButton;
+import androidx.fragment.app.Fragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class RegisterActivity extends AppCompatActivity {
+import java.util.concurrent.Executor;
+
+public class RegisterFragment extends Fragment {
+
     private EditText username;
     private EditText password;
     private EditText repPassword;
     private FirebaseAuth mAuth;
 
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_register, container, false);
 
-        initializeViews();
-        initializeFirebaseAuth();
-    }
-
-    private void initializeViews() {
-        username = findViewById(R.id.username);
-        password = findViewById(R.id.password);
-        repPassword = findViewById(R.id.repeat_password);
-        Button registerButton = findViewById(R.id.register_button);
-        registerButton.setOnClickListener(this::registerUser);
-    }
-
-    private void initializeFirebaseAuth() {
         mAuth = FirebaseAuth.getInstance();
+
+        initializeViews(view);
+
+        return view;
+    }
+
+    private void initializeViews(View view) {
+        username = view.findViewById(R.id.username);
+        password = view.findViewById(R.id.password);
+        repPassword = view.findViewById(R.id.repeat_password);
+        AppCompatImageButton returnButton = view.findViewById(R.id.return_button);
+        Button registerButton = view.findViewById(R.id.register_button);
+        registerButton.setOnClickListener(this::registerUser);
+        returnButton.setOnClickListener(v -> {
+            if (getActivity() instanceof AuthActivity) {
+                ((AuthActivity) getActivity()).navigateToWelcome();
+            }
+        });
+
+
     }
 
     private void registerUser(View view) {
@@ -79,7 +92,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void createUserInFirebase(String user, String pass) {
         mAuth.createUserWithEmailAndPassword(user + "@example.com", pass)
-                .addOnCompleteListener(this, task -> {
+                .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser firebaseUser = mAuth.getCurrentUser();
                         if (firebaseUser != null) {
@@ -93,18 +106,22 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void showToast(String message) {
-        Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
     }
 
     private void navigateToHome() {
-        Intent intent = new Intent(RegisterActivity.this, HomeActivity.class);
+        Intent intent = new Intent(getActivity(), HomeActivity.class);
         startActivity(intent);
-        finish();
+        if (getActivity() != null) {
+            getActivity().finish();
+        }
     }
 
-    public void returnButton(View view) {
-        Intent intent = new Intent(RegisterActivity.this, WelcomeActivity.class);
-        startActivity(intent);
-        finish();
-    }
+
+
+//    public void returnButton(View view) {
+//        Intent intent = new Intent(getActivity(), WelcomeActivity.class);
+//        startActivity(intent);
+//        getActivity().finish();
+//    }
 }
