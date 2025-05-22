@@ -70,6 +70,12 @@ public class HomeActivity extends AppCompatActivity {
         workoutAdapter.setOnDeleteClickListener(position -> {
             showDeleteWorkoutDialog(position);
         });
+        Button instructionsButton = findViewById(R.id.instructions);
+        instructionsButton.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, InstructionsActivity.class);
+            startActivity(intent);
+            finish();
+        });
         workoutList.setAdapter(workoutAdapter);
 
         // Настройка бокового меню
@@ -262,7 +268,6 @@ public class HomeActivity extends AppCompatActivity {
                         "Failed to load workouts", Toast.LENGTH_SHORT).show());
     }
 
-    // Метод для установки будильника для уведомлений о тренировке
     private void scheduleWorkoutAlarm(String type, String time, String days) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

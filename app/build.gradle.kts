@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.example.bestworkout"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.bestworkout"
