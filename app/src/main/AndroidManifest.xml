@@ -28,9 +28,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".HomeActivity" />
-<!--        <activity android:name=".RegisterActivity" />-->
         <activity android:name=".ProfileActivity" />
         <activity android:name=".InstructionsActivity" />
+        <activity android:name=".WorkoutAdviceActivity" />
+
     </application>
 
 </manifest>

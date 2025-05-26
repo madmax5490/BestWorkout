@@ -52,7 +52,7 @@
                     <ImageView
                         android:layout_width="64dp"
                         android:layout_height="64dp"
-                        android:src="@android:drawable/ic_menu_directions"
+                        android:src="@drawable/run_fast"
                         android:contentDescription="Running" />
 
                     <TextView
@@ -86,7 +86,7 @@
                     <ImageView
                         android:layout_width="64dp"
                         android:layout_height="64dp"
-                        android:src="@android:drawable/ic_menu_compass"
+                        android:src="@drawable/weight_lifter"
                         android:contentDescription="Gym" />
 
                     <TextView
@@ -121,7 +121,7 @@
                     <ImageView
                         android:layout_width="64dp"
                         android:layout_height="64dp"
-                        android:src="@android:drawable/ic_menu_rotate"
+                        android:src="@drawable/swim"
                         android:contentDescription="Swimming" />
 
                     <TextView
@@ -155,7 +155,7 @@
                     <ImageView
                         android:layout_width="64dp"
                         android:layout_height="64dp"
-                        android:src="@android:drawable/ic_menu_send"
+                        android:src="@drawable/bike"
                         android:contentDescription="Cycling" />
 
                     <TextView
@@ -190,7 +190,7 @@
                     <ImageView
                         android:layout_width="64dp"
                         android:layout_height="64dp"
-                        android:src="@android:drawable/ic_menu_myplaces"
+                        android:src="@drawable/tennis"
                         android:contentDescription="Tennis" />
 
                     <TextView
@@ -224,7 +224,7 @@
                     <ImageView
                         android:layout_width="64dp"
                         android:layout_height="64dp"
-                        android:src="@android:drawable/ic_menu_sort_by_size"
+                        android:src="@drawable/food_apple"
                         android:contentDescription="Lyfestyle" />
 
                     <TextView
