@@ -18,7 +18,8 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:scaleType="centerCrop"
-            android:contentDescription="Tip illustration" />
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/tip_illustration" />
 
         <TextView
             android:id="@+id/tip_text"
